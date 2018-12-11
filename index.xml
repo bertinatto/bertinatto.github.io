@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title> </title>
-    <link>https://bertinatto.github.io/blog/</link>
+    <link>https://bertinatto.github.io/</link>
     <language>en-us</language>
     <author>bertinatto</author>
     <rights>(C) 2018</rights>
@@ -16,10 +16,10 @@
       
         <item>
           <title>Building a Latex resume and not worrying about compiling it</title>
-          <link>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</link>
+          <link>https://bertinatto.github.io/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</link>
           <pubDate>Sat, 03 Feb 2018 20:26:18 CET</pubDate>
           <author>bertinatto</author>
-          <guid>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</guid>
+          <guid>https://bertinatto.github.io/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</guid>
           <description>&lt;p&gt;A long time ago I came accross Adrian Friggeri&amp;rsquo;s resume built with Latex. I couldn&amp;rsquo;t find the original template, but did found &lt;a href=&#34;https://www.latextemplates.com/template/friggeri-resume-cv&#34;&gt;this page&lt;/a&gt; with a customization.&lt;/p&gt;
 
 &lt;p&gt;I found that template amazing and I decided I wanted my resume to be like that. I was looking for a new job, so why not?  That being said, I spent hours and hours on it; I installed uncountable dependencies, made some Helvetica fonts work on my Linux box, created the perfect descriptions for my previous positions, adjusted the alignments with so much care. Phew, I finally managed to have my fancy curriculum!&lt;/p&gt;
@@ -49,10 +49,10 @@ RUN microdnf update &amp;amp;&amp;amp; \
       
         <item>
           <title>Fork-like behaviour in Go</title>
-          <link>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</link>
+          <link>https://bertinatto.github.io/2017/12/27/fork-like-behaviour-in-go/</link>
           <pubDate>Wed, 27 Dec 2017 09:06:40 CET</pubDate>
           <author>bertinatto</author>
-          <guid>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</guid>
+          <guid>https://bertinatto.github.io/2017/12/27/fork-like-behaviour-in-go/</guid>
           <description>
 
 &lt;p&gt;Recently, I have been looking into how to implement Linux Namespaces in Go.&lt;/p&gt;
@@ -146,10 +146,10 @@ child_pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; clone(childFu
       
         <item>
           <title>Reflections on 2017</title>
-          <link>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</link>
+          <link>https://bertinatto.github.io/2017/12/24/reflections-on-2017/</link>
           <pubDate>Sun, 24 Dec 2017 11:04:52 CET</pubDate>
           <author>bertinatto</author>
-          <guid>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</guid>
+          <guid>https://bertinatto.github.io/2017/12/24/reflections-on-2017/</guid>
           <description>
 
 &lt;h1 id=&#34;on-reading&#34;&gt;On reading&lt;/h1&gt;
@@ -204,10 +204,10 @@ child_pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; clone(childFu
       
         <item>
           <title>Hello</title>
-          <link>https://bertinatto.github.io/blog/2017/06/25/hello/</link>
+          <link>https://bertinatto.github.io/2017/06/25/hello/</link>
           <pubDate>Sun, 25 Jun 2017 10:04:45 -0300</pubDate>
           <author>bertinatto</author>
-          <guid>https://bertinatto.github.io/blog/2017/06/25/hello/</guid>
+          <guid>https://bertinatto.github.io/2017/06/25/hello/</guid>
           <description>&lt;p&gt;&amp;hellip; world!&lt;/p&gt;
 </description>
         </item>

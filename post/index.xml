@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on </title>
-    <link>https://bertinatto.github.io/blog/post/</link>
+    <link>https://bertinatto.github.io/post/</link>
     <description>Recent content in Posts on </description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Sat, 03 Feb 2018 20:26:18 +0100</lastBuildDate>
     
-	<atom:link href="https://bertinatto.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bertinatto.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Building a Latex resume and not worrying about compiling it</title>
-      <link>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</link>
+      <link>https://bertinatto.github.io/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</link>
       <pubDate>Sat, 03 Feb 2018 20:26:18 +0100</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</guid>
+      <guid>https://bertinatto.github.io/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</guid>
       <description>A long time ago I came accross Adrian Friggeri&amp;rsquo;s resume built with Latex. I couldn&amp;rsquo;t find the original template, but did found this page with a customization.
 I found that template amazing and I decided I wanted my resume to be like that. I was looking for a new job, so why not? That being said, I spent hours and hours on it; I installed uncountable dependencies, made some Helvetica fonts work on my Linux box, created the perfect descriptions for my previous positions, adjusted the alignments with so much care.</description>
     </item>
     
     <item>
       <title>Fork-like behaviour in Go</title>
-      <link>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</link>
+      <link>https://bertinatto.github.io/2017/12/27/fork-like-behaviour-in-go/</link>
       <pubDate>Wed, 27 Dec 2017 09:06:40 +0100</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</guid>
+      <guid>https://bertinatto.github.io/2017/12/27/fork-like-behaviour-in-go/</guid>
       <description>Recently, I have been looking into how to implement Linux Namespaces in Go.
 In C, the way we isolate a process in certain Namespaces is by specifying them in the tags parameter of clone(2). For instance, user_namespaces(7) provides the following example to illustrate this.
 (...) while ((opt = getopt(argc, argv, &amp;#34;+imnpuUM:G:zv&amp;#34;)) != -1) { switch (opt) { case &amp;#39;i&amp;#39;: flags |= CLONE_NEWIPC; break; case &amp;#39;m&amp;#39;: flags |= CLONE_NEWNS; break; case &amp;#39;n&amp;#39;: flags |= CLONE_NEWNET; break; case &amp;#39;p&amp;#39;: flags |= CLONE_NEWPID; break; case &amp;#39;u&amp;#39;: flags |= CLONE_NEWUTS; break; case &amp;#39;v&amp;#39;: verbose = 1; break; case &amp;#39;z&amp;#39;: map_zero = 1; break; case &amp;#39;M&amp;#39;: uid_map = optarg; break; case &amp;#39;G&amp;#39;: gid_map = optarg; break; case &amp;#39;U&amp;#39;: flags |= CLONE_NEWUSER; break; default: usage(argv[0]); } } (.</description>
@@ -33,20 +33,20 @@ In C, the way we isolate a process in certain Namespaces is by specifying them i
     
     <item>
       <title>Reflections on 2017</title>
-      <link>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</link>
+      <link>https://bertinatto.github.io/2017/12/24/reflections-on-2017/</link>
       <pubDate>Sun, 24 Dec 2017 11:04:52 +0100</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</guid>
+      <guid>https://bertinatto.github.io/2017/12/24/reflections-on-2017/</guid>
       <description>On reading I managed to complete my 2017 Reading Challenge and read 12 books this year. This was an improvement from last year, when I read only 5.
 To be quite frankly, I strategically picked a few small books so I could finish the challenge on time. I believe this is OK, but I would rather measure my reading habit by days I actually read something. Since it would be more difficult to track this approach, I am OK with the number of books for now.</description>
     </item>
     
     <item>
       <title>Hello</title>
-      <link>https://bertinatto.github.io/blog/2017/06/25/hello/</link>
+      <link>https://bertinatto.github.io/2017/06/25/hello/</link>
       <pubDate>Sun, 25 Jun 2017 10:04:45 -0300</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/2017/06/25/hello/</guid>
+      <guid>https://bertinatto.github.io/2017/06/25/hello/</guid>
       <description>&amp;hellip; world!</description>
     </item>
     

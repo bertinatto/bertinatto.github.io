@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Fixeds on </title>
-    <link>https://bertinatto.github.io/blog/fixed/</link>
+    <link>https://bertinatto.github.io/fixed/</link>
     <description>Recent content in Fixeds on </description>
     <generator>Hugo -- gohugo.io</generator>
     
-	<atom:link href="https://bertinatto.github.io/blog/fixed/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bertinatto.github.io/fixed/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Now</title>
-      <link>https://bertinatto.github.io/blog/now/</link>
+      <link>https://bertinatto.github.io/now/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/now/</guid>
+      <guid>https://bertinatto.github.io/now/</guid>
       <description>This page is inspired by Derek Sivers&amp;rsquo; /now page movement.
 I&amp;rsquo;m living and working in Brno, Czech Republic. In my free time I&amp;rsquo;m trying to get better at Linux containers.
 This page was last updated on February 10th, 2018.</description>
@@ -22,10 +22,10 @@ This page was last updated on February 10th, 2018.</description>
     
     <item>
       <title>About</title>
-      <link>https://bertinatto.github.io/blog/about/</link>
+      <link>https://bertinatto.github.io/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://bertinatto.github.io/blog/about/</guid>
+      <guid>https://bertinatto.github.io/about/</guid>
       <description>My name is Fábio and I am a programmer. This blog is meant to be a log of things that I learned recently.</description>
     </item>
     
