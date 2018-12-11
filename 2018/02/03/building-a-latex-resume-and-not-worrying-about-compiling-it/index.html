@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Building a Latex resume and not worrying about compiling it &middot; Fábio&#39;s notes
+    
+  </title>
+
+  
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/poole.css">
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/syntax.css">
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700|PT+Sans:400">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://bertinatto.github.io/blog/assets/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="https://bertinatto.github.io/blog/assets/favicon.ico">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://bertinatto.github.io/blog/atom.xml">
+</head>
+
+
+  <body>
+
+    
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+
+<div class="sidebar" id="sidebar">
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/">Home</a>
+    <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/post">Posts</a>
+
+    
+    
+      
+        <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/now/">Now</a>
+      
+    
+      
+        <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/about/">About</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+
+  </nav>
+
+  <div class="sidebar-item">
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="https://bertinatto.github.io/blog/" title="Home">Fábio&#39;s notes</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+
+
+<div class="post">
+  <h1 class="post-title">Building a Latex resume and not worrying about compiling it</h1>
+  <span class="post-date">Feb 3, 2018</span>
+  <p>A long time ago I came accross Adrian Friggeri&rsquo;s resume built with Latex. I couldn&rsquo;t find the original template, but did found <a href="https://www.latextemplates.com/template/friggeri-resume-cv">this page</a> with a customization.</p>
+
+<p>I found that template amazing and I decided I wanted my resume to be like that. I was looking for a new job, so why not?  That being said, I spent hours and hours on it; I installed uncountable dependencies, made some Helvetica fonts work on my Linux box, created the perfect descriptions for my previous positions, adjusted the alignments with so much care. Phew, I finally managed to have my fancy curriculum!</p>
+
+<p>Eventually I got a new job and forgot about it, until I decided to update it. At that point I had a clean OS installation, so I&rsquo;d have to install all those dependencies again. As a result, I decided to ditch that resume and build a simpler one, based on the well-known <a href="https://www.ctan.org/pkg/moderncv">moderncv</a> template. This one was simpler to compile as it required fewer dependencies so I thought my problem was soved.</p>
+
+<p>However, recently I decided to update it, and guess what? For some reason it didn&rsquo;t compile. Then I realized that the building process of my resume would be a great candidate to be containerized. To make things better, I found out that there is a <code>moderncv</code> package available in Fedora 27. So I quickly put together this simple Dockerfile in my resume directory:</p>
+
+<pre><code>FROM fedora-minimal:27
+
+VOLUME /data
+
+WORKDIR /data
+
+RUN microdnf update &amp;&amp; \
+    microdnf install texlive texlive-xetex texlive-moderncv &amp;&amp; \
+    microdnf clean all
+</code></pre>
+
+<p>Voilà! Build the image, push it to Docker Hub and you will never have install <code>texlive</code> and its dependencies only to compile your resume again.</p>
+
+<p>If you are interested you can check my <a href="https://github.com/bertinatto/resume">GitHub repository</a> for a complete example.</p>
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+  </body>
+</html>
+

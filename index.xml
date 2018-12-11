@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title> </title>
+    <link>https://bertinatto.github.io/blog/</link>
+    <language>en-us</language>
+    <author>bertinatto</author>
+    <rights>(C) 2018</rights>
+    <updated>2018-02-03 20:26:18 &#43;0100 CET</updated>
+
+    
+      
+    
+      
+    
+      
+        <item>
+          <title>Building a Latex resume and not worrying about compiling it</title>
+          <link>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</link>
+          <pubDate>Sat, 03 Feb 2018 20:26:18 CET</pubDate>
+          <author>bertinatto</author>
+          <guid>https://bertinatto.github.io/blog/2018/02/03/building-a-latex-resume-and-not-worrying-about-compiling-it/</guid>
+          <description>&lt;p&gt;A long time ago I came accross Adrian Friggeri&amp;rsquo;s resume built with Latex. I couldn&amp;rsquo;t find the original template, but did found &lt;a href=&#34;https://www.latextemplates.com/template/friggeri-resume-cv&#34;&gt;this page&lt;/a&gt; with a customization.&lt;/p&gt;
+
+&lt;p&gt;I found that template amazing and I decided I wanted my resume to be like that. I was looking for a new job, so why not?  That being said, I spent hours and hours on it; I installed uncountable dependencies, made some Helvetica fonts work on my Linux box, created the perfect descriptions for my previous positions, adjusted the alignments with so much care. Phew, I finally managed to have my fancy curriculum!&lt;/p&gt;
+
+&lt;p&gt;Eventually I got a new job and forgot about it, until I decided to update it. At that point I had a clean OS installation, so I&amp;rsquo;d have to install all those dependencies again. As a result, I decided to ditch that resume and build a simpler one, based on the well-known &lt;a href=&#34;https://www.ctan.org/pkg/moderncv&#34;&gt;moderncv&lt;/a&gt; template. This one was simpler to compile as it required fewer dependencies so I thought my problem was soved.&lt;/p&gt;
+
+&lt;p&gt;However, recently I decided to update it, and guess what? For some reason it didn&amp;rsquo;t compile. Then I realized that the building process of my resume would be a great candidate to be containerized. To make things better, I found out that there is a &lt;code&gt;moderncv&lt;/code&gt; package available in Fedora 27. So I quickly put together this simple Dockerfile in my resume directory:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM fedora-minimal:27
+
+VOLUME /data
+
+WORKDIR /data
+
+RUN microdnf update &amp;amp;&amp;amp; \
+    microdnf install texlive texlive-xetex texlive-moderncv &amp;amp;&amp;amp; \
+    microdnf clean all
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Voilà! Build the image, push it to Docker Hub and you will never have install &lt;code&gt;texlive&lt;/code&gt; and its dependencies only to compile your resume again.&lt;/p&gt;
+
+&lt;p&gt;If you are interested you can check my &lt;a href=&#34;https://github.com/bertinatto/resume&#34;&gt;GitHub repository&lt;/a&gt; for a complete example.&lt;/p&gt;
+</description>
+        </item>
+      
+    
+      
+        <item>
+          <title>Fork-like behaviour in Go</title>
+          <link>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</link>
+          <pubDate>Wed, 27 Dec 2017 09:06:40 CET</pubDate>
+          <author>bertinatto</author>
+          <guid>https://bertinatto.github.io/blog/2017/12/27/fork-like-behaviour-in-go/</guid>
+          <description>
+
+&lt;p&gt;Recently, I have been looking into how to implement Linux Namespaces in Go.&lt;/p&gt;
+
+&lt;p&gt;In C, the way we isolate a process in certain Namespaces is by specifying them in the &lt;code&gt;tags&lt;/code&gt; parameter of &lt;code&gt;clone(2)&lt;/code&gt;. For instance, &lt;code&gt;user_namespaces(7)&lt;/code&gt; provides the following example to illustrate this.&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;(...)
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;while&lt;/span&gt; ((opt &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getopt(argc, argv, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;+imnpuUM:G:zv&amp;#34;&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) {
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;switch&lt;/span&gt; (opt) {
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;i&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWIPC;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;m&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWNS;         &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;n&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWNET;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;p&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWPID;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;u&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWUTS;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;v&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; verbose &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;;                  &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;z&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; map_zero &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;;                 &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;M&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; uid_map &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; optarg;             &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;G&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; gid_map &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; optarg;             &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;U&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; flags &lt;span style=&#34;color:#f92672&#34;&gt;|=&lt;/span&gt; CLONE_NEWUSER;       &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;default&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;  usage(argv[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;]);
+        }
+    }
+
+(...)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;/* Create the child in new namespace(s) */&lt;/span&gt;
+
+child_pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; clone(childFunc, child_stack &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; STACK_SIZE,
+                 flags &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; SIGCHLD, &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;args);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (child_pid &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+   errExit(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;clone&amp;#34;&lt;/span&gt;);
+
+(...)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id=&#34;the-problem&#34;&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;Everything looks well and good, so I wanted to do the same in Go. However, I soon found out that &lt;code&gt;fork(2)&lt;/code&gt; (i.e., &lt;code&gt;clone(2)&lt;/code&gt;) isn&amp;rsquo;t the right way to do so. The problem lies on the fact that &lt;code&gt;fork(2)&lt;/code&gt; creates the new child by copying &lt;strong&gt;only&lt;/strong&gt; the main thread of execution. Even if a Go program is single-threaded, under the hood there might be many other threads executing in the Go runtime. As a result, &lt;code&gt;fork(2)&lt;/code&gt; isn&amp;rsquo;t really a nice way of creating a child process in Go.&lt;/p&gt;
+
+&lt;h2 id=&#34;possible-workarounds&#34;&gt;Possible workarounds&lt;/h2&gt;
+
+&lt;p&gt;The first solution that comes to mind is to use the &lt;code&gt;os/exec&lt;/code&gt; package. Plus, with this package it&amp;rsquo;s possible to define the Namespaces of the child process by setting the attributes of the command:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;exec&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Command&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ls&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;-l&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;SysProcAttr&lt;/span&gt; = &lt;span style=&#34;color:#a6e22e&#34;&gt;syscall&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;SysProcAttr&lt;/span&gt;{
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;Cloneflats&lt;/span&gt;: &lt;span style=&#34;color:#a6e22e&#34;&gt;syscall&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;CLONE_NEWIPC&lt;/span&gt;,
+}
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Run&lt;/span&gt;(); &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+    (&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Everything looks great, but if a process call itself, wouldn&amp;rsquo;t the resulting process call itself again? Wouldn&amp;rsquo;t I get into an infinite loop?&lt;/p&gt;
+
+&lt;p&gt;When I came accross this problem I promply split my program into two: a parent and a child. The former would simply call the latter with the appropriate flags set.  However, for practical reasons, I wanted to have all my code in a single program, so I started looking for alternatives.&lt;/p&gt;
+
+&lt;p&gt;Another possible solution would have been to have different arguments in the command to alternate between parent and child. For example, when executed, &lt;code&gt;program&lt;/code&gt; would start in parent mode and then it would call itself by doing &lt;code&gt;program child&lt;/code&gt;. That sounded a bit sloppy for me, though. For exampmle, what if the user call &lt;code&gt;program child&lt;/code&gt; directly?&lt;/p&gt;
+
+&lt;h2 id=&#34;my-choice&#34;&gt;My choice&lt;/h2&gt;
+
+&lt;p&gt;I wondered how &lt;a href=&#34;https://github.com/moby/moby&#34;&gt;Moby&lt;/a&gt; addresses this issue, so looking at its codebase I found the &lt;code&gt;reexec&lt;/code&gt; package that does exactly what I wanted.&lt;/p&gt;
+
+&lt;p&gt;The solution used by this package is very interesting. First, to call itself a process could simply execute &lt;code&gt;/proc/self/exe&lt;/code&gt;, which, according to &lt;code&gt;proc(5)&lt;/code&gt;, is a symbolic link to the actual executed command. Then, we could ovewrite the command&amp;rsquo;s argument &lt;code&gt;os.Args[0]&lt;/code&gt; in order to signal the resulting process that it&amp;rsquo;s a child.&lt;/p&gt;
+
+&lt;p&gt;With that in mind, it&amp;rsquo;s possible to re-execute a Go program by doing:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;exec&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Cmd&lt;/span&gt;{
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;Path&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/proc/self/exe&amp;#34;&lt;/span&gt;,
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;Args&lt;/span&gt;: []&lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;child&amp;#34;&lt;/span&gt;},
+    (&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+}
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Run&lt;/span&gt;(); &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+    (&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;And in &lt;code&gt;main()&lt;/code&gt; we can check if the program running was re-executed by doing someting like this:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;switch&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;os&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Args&lt;/span&gt;[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;] {
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;:
+        (&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;child&amp;#34;&lt;/span&gt;:
+        (&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+     }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Yes, that&amp;rsquo;s right! We overwrote &lt;code&gt;os.Args[0]&lt;/code&gt;!&lt;/p&gt;
+
+&lt;p&gt;This still smells like a hack, but I found it to be a nice way to re-execute a process in Go.&lt;/p&gt;
+</description>
+        </item>
+      
+    
+      
+        <item>
+          <title>Reflections on 2017</title>
+          <link>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</link>
+          <pubDate>Sun, 24 Dec 2017 11:04:52 CET</pubDate>
+          <author>bertinatto</author>
+          <guid>https://bertinatto.github.io/blog/2017/12/24/reflections-on-2017/</guid>
+          <description>
+
+&lt;h1 id=&#34;on-reading&#34;&gt;On reading&lt;/h1&gt;
+
+&lt;p&gt;I managed to complete my &lt;a href=&#34;https://www.goodreads.com/challenges/5493-2017-reading-challenge&#34;&gt;2017 Reading Challenge&lt;/a&gt; and read 12 books this year. This was an improvement from last year, when I read only 5.&lt;/p&gt;
+
+&lt;p&gt;To be quite frankly, I strategically picked a few small books so I could finish the challenge on time. I believe this is OK, but I would rather measure my reading habit by days I actually read something. Since it would be more difficult to track this approach, I am OK with the number of books for now.&lt;/p&gt;
+
+&lt;p&gt;Also, 2017 was the year that I got interested in fiction books. Non-fiction books are great to get new insights, but there is nothing more enjoyable that reading a good story in the early morning over a cup of coffee.&lt;/p&gt;
+
+&lt;h1 id=&#34;on-writing-software&#34;&gt;On writing software&lt;/h1&gt;
+
+&lt;p&gt;On the software engineeting side, I broke some new grounds in 2017.&lt;/p&gt;
+
+&lt;p&gt;I learned a little bit of Rust in the beginning of the year.&lt;/p&gt;
+
+&lt;p&gt;I read the first edition of The Rust &lt;a href=&#34;https://doc.rust-lang.org/book/first-edition&#34;&gt;Programming Language&lt;/a&gt; book and after a few days I manged to overcome the borrow checker and compile some small programs. Following that, I implemented a simple Pomodor timer that I called &lt;a href=&#34;https://github.com/bertinatto/prod&#34;&gt;prod&lt;/a&gt;. The highlight of the journey, though, was my implementation of the &lt;a href=&#34;https://github.com/redox-os/coreutils/commit/0a06679980e8b03d734a3ee5e3f5c2a785b081b6&#34;&gt;uniq&lt;/a&gt; command for the Redox OS.&lt;/p&gt;
+
+&lt;p&gt;I also got a bit more experience in Go. I developed a prototype for an NTP server called &lt;a href=&#34;https://github.com/bertinatto/ohrad&#34;&gt;ohrad&lt;/a&gt;. Also, I implemented a simple HTTTP daemon in my job. The highlight was &lt;a href=&#34;https://github.com/projectatomic/buildah/pull/336&#34;&gt;buildah PR&lt;/a&gt;. This one was very rewarding for me, specially because buildah is part of the &lt;a href=&#34;https://www.projectatomic.io/&#34;&gt;Atomic Project&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The ugly duckling was C. In the hope to get more experience in this language I started a simple in-memory cache that I called &lt;a href=&#34;https://github.com/bertinatto/hashd&#34;&gt;hashd&lt;/a&gt;. I never really finished it, but I did learned a few new things on the way.&lt;/p&gt;
+
+&lt;h1 id=&#34;on-changing-jobs&#34;&gt;On changing jobs&lt;/h1&gt;
+
+&lt;p&gt;2017 was the year that I left Scrapinghub and joined Red Hat.&lt;/p&gt;
+
+&lt;p&gt;I left Scrapinghub after 3 years I can&amp;rsquo;t even describe how much I evolved there. I was very happy to be joining Red Hat, but at the same time I was very sad to leave Scrapinghub.&lt;/p&gt;
+
+&lt;p&gt;The process of getting my Czech Visa approved took around 6 months, but fortunatelly everything worked out well.&lt;/p&gt;
+
+&lt;h1 id=&#34;on-writing&#34;&gt;On writing&lt;/h1&gt;
+
+&lt;p&gt;In 2017 I wrote many journal entries, but I failed to make it a habit. I found it a tedius task, but I confedd it&amp;rsquo;s pretty rewarding to read something I wrote a long time ago. It&amp;rsquo;s impressive to see how much I evolved and, at the same time, how I struggle with some recurring issues.&lt;/p&gt;
+
+&lt;p&gt;When it comes to blogging, I completely failed in 2017. I put down some random notes from different topics that later would become blog posts, but they never really reached to their  final destination.&lt;/p&gt;
+
+&lt;h1 id=&#34;on-playing-the-guitar&#34;&gt;On playing the guitar&lt;/h1&gt;
+
+&lt;p&gt;I started to play the guitar but I had to leave it in Brazil. I made some progress and managed to play a few simple musics and fingerstyles. Nothing that someone would enjoy listening to, though.&lt;/p&gt;
+
+&lt;h1 id=&#34;on-lifting&#34;&gt;On lifting&lt;/h1&gt;
+
+&lt;p&gt;I was deadlifting 140 kilos and squatting 136 kilos (not counting the bar) right before moving to Czech Republic. I had to stop lifting for a while until I settled down in Czech Republic, and my weights went down considerably. Hopefully I will get back to those numbers in 2018!&lt;/p&gt;
+
+&lt;h1 id=&#34;on-traveling&#34;&gt;On traveling&lt;/h1&gt;
+
+&lt;p&gt;The only long travel of 2017 happened when I moved from Brazil to Czech Republic. However, living in the middle of Europe brings great advantages! In 2017 I managed to visit 4 countries for the first time: Czech Republic, Germany, Austria and Hungary.&lt;/p&gt;
+</description>
+        </item>
+      
+    
+      
+        <item>
+          <title>Hello</title>
+          <link>https://bertinatto.github.io/blog/2017/06/25/hello/</link>
+          <pubDate>Sun, 25 Jun 2017 10:04:45 -0300</pubDate>
+          <author>bertinatto</author>
+          <guid>https://bertinatto.github.io/blog/2017/06/25/hello/</guid>
+          <description>&lt;p&gt;&amp;hellip; world!&lt;/p&gt;
+</description>
+        </item>
+      
+    
+
+  </channel>
+</rss>

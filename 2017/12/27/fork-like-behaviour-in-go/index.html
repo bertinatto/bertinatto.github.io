@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Fork-like behaviour in Go &middot; Fábio&#39;s notes
+    
+  </title>
+
+  
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/poole.css">
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/syntax.css">
+  <link rel="stylesheet" href="https://bertinatto.github.io/blog/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700|PT+Sans:400">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://bertinatto.github.io/blog/assets/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="https://bertinatto.github.io/blog/assets/favicon.ico">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://bertinatto.github.io/blog/atom.xml">
+</head>
+
+
+  <body>
+
+    
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+
+<div class="sidebar" id="sidebar">
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/">Home</a>
+    <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/post">Posts</a>
+
+    
+    
+      
+        <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/now/">Now</a>
+      
+    
+      
+        <a class="sidebar-nav-item " href="https://bertinatto.github.io/blog/about/">About</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+
+  </nav>
+
+  <div class="sidebar-item">
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="https://bertinatto.github.io/blog/" title="Home">Fábio&#39;s notes</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+
+
+<div class="post">
+  <h1 class="post-title">Fork-like behaviour in Go</h1>
+  <span class="post-date">Dec 27, 2017</span>
+  
+
+<p>Recently, I have been looking into how to implement Linux Namespaces in Go.</p>
+
+<p>In C, the way we isolate a process in certain Namespaces is by specifying them in the <code>tags</code> parameter of <code>clone(2)</code>. For instance, <code>user_namespaces(7)</code> provides the following example to illustrate this.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">(...)
+
+<span style="color:#66d9ef">while</span> ((opt <span style="color:#f92672">=</span> getopt(argc, argv, <span style="color:#e6db74">&#34;+imnpuUM:G:zv&#34;</span>)) <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+        <span style="color:#66d9ef">switch</span> (opt) {
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;i&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWIPC;        <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;m&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWNS;         <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;n&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWNET;        <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;p&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWPID;        <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;u&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWUTS;        <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;v&#39;</span><span style="color:#f92672">:</span> verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;                  <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;z&#39;</span><span style="color:#f92672">:</span> map_zero <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;                 <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;M&#39;</span><span style="color:#f92672">:</span> uid_map <span style="color:#f92672">=</span> optarg;             <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;G&#39;</span><span style="color:#f92672">:</span> gid_map <span style="color:#f92672">=</span> optarg;             <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;U&#39;</span><span style="color:#f92672">:</span> flags <span style="color:#f92672">|=</span> CLONE_NEWUSER;       <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>  usage(argv[<span style="color:#ae81ff">0</span>]);
+        }
+    }
+
+(...)
+
+<span style="color:#75715e">/* Create the child in new namespace(s) */</span>
+
+child_pid <span style="color:#f92672">=</span> clone(childFunc, child_stack <span style="color:#f92672">+</span> STACK_SIZE,
+                 flags <span style="color:#f92672">|</span> SIGCHLD, <span style="color:#f92672">&amp;</span>args);
+<span style="color:#66d9ef">if</span> (child_pid <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+   errExit(<span style="color:#e6db74">&#34;clone&#34;</span>);
+
+(...)</code></pre></div>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>Everything looks well and good, so I wanted to do the same in Go. However, I soon found out that <code>fork(2)</code> (i.e., <code>clone(2)</code>) isn&rsquo;t the right way to do so. The problem lies on the fact that <code>fork(2)</code> creates the new child by copying <strong>only</strong> the main thread of execution. Even if a Go program is single-threaded, under the hood there might be many other threads executing in the Go runtime. As a result, <code>fork(2)</code> isn&rsquo;t really a nice way of creating a child process in Go.</p>
+
+<h2 id="possible-workarounds">Possible workarounds</h2>
+
+<p>The first solution that comes to mind is to use the <code>os/exec</code> package. Plus, with this package it&rsquo;s possible to define the Namespaces of the child process by setting the attributes of the command:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">exec</span>.<span style="color:#a6e22e">Command</span>(<span style="color:#e6db74">&#34;ls&#34;</span>, <span style="color:#e6db74">&#34;-l&#34;</span>)
+<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">SysProcAttr</span> = <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">SysProcAttr</span>{
+    <span style="color:#a6e22e">Cloneflats</span>: <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">CLONE_NEWIPC</span>,
+}
+<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">Run</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+    (<span style="color:#f92672">...</span>)</code></pre></div>
+
+<p>Everything looks great, but if a process call itself, wouldn&rsquo;t the resulting process call itself again? Wouldn&rsquo;t I get into an infinite loop?</p>
+
+<p>When I came accross this problem I promply split my program into two: a parent and a child. The former would simply call the latter with the appropriate flags set.  However, for practical reasons, I wanted to have all my code in a single program, so I started looking for alternatives.</p>
+
+<p>Another possible solution would have been to have different arguments in the command to alternate between parent and child. For example, when executed, <code>program</code> would start in parent mode and then it would call itself by doing <code>program child</code>. That sounded a bit sloppy for me, though. For exampmle, what if the user call <code>program child</code> directly?</p>
+
+<h2 id="my-choice">My choice</h2>
+
+<p>I wondered how <a href="https://github.com/moby/moby">Moby</a> addresses this issue, so looking at its codebase I found the <code>reexec</code> package that does exactly what I wanted.</p>
+
+<p>The solution used by this package is very interesting. First, to call itself a process could simply execute <code>/proc/self/exe</code>, which, according to <code>proc(5)</code>, is a symbolic link to the actual executed command. Then, we could ovewrite the command&rsquo;s argument <code>os.Args[0]</code> in order to signal the resulting process that it&rsquo;s a child.</p>
+
+<p>With that in mind, it&rsquo;s possible to re-execute a Go program by doing:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">exec</span>.<span style="color:#a6e22e">Cmd</span>{
+    <span style="color:#a6e22e">Path</span>: <span style="color:#e6db74">&#34;/proc/self/exe&#34;</span>,
+    <span style="color:#a6e22e">Args</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;child&#34;</span>},
+    (<span style="color:#f92672">...</span>)
+}
+<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">Run</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+    (<span style="color:#f92672">...</span>)
+}</code></pre></div>
+
+<p>And in <code>main()</code> we can check if the program running was re-executed by doing someting like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Args</span>[<span style="color:#ae81ff">0</span>] {
+    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;parent&#34;</span>:
+        (<span style="color:#f92672">...</span>)
+    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;child&#34;</span>:
+        (<span style="color:#f92672">...</span>)
+     }</code></pre></div>
+
+<p>Yes, that&rsquo;s right! We overwrote <code>os.Args[0]</code>!</p>
+
+<p>This still smells like a hack, but I found it to be a nice way to re-execute a process in Go.</p>
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+  </body>
+</html>
+
